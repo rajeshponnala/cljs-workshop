@@ -10,7 +10,5 @@ pom.xml.asc
 .lein-plugins/
 .lein-failures
 .nrepl-port
-<<<<<<< HEAD
 .lein-repl-history
-=======
->>>>>>> fa6d635f094a9be826a8a135fe3361ce6dd1d38b
+/resources/public/js/out
