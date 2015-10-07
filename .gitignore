@@ -1,0 +1,16 @@
+pom.xml
+pom.xml.asc
+*jar
+/lib/
+/classes/
+/target/
+/checkouts/
+.lein-deps-sum
+.lein-repl-history
+.lein-plugins/
+.lein-failures
+.nrepl-port
+<<<<<<< HEAD
+.lein-repl-history
+=======
+>>>>>>> fa6d635f094a9be826a8a135fe3361ce6dd1d38b
