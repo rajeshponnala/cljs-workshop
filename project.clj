@@ -9,7 +9,8 @@
                  [ring/ring-servlet "1.3.2" :exclusions [javax.servlet/servlet-api]]
                  [ring/ring-defaults "0.1.2" :exclusions [javax.servlet/servlet-api]]
                  [cc.qbits/jet "0.5.4"]
-                 [org.clojure/clojurescript "0.0-2843"]]
+                 [org.clojure/clojurescript "0.0-2843"]
+                 [secretary "1.2.3"]]
   :plugins [[lein-cljsbuild "1.0.4"]]
   :source-paths ["src/clj"]
   :main cljsworkshop.core
