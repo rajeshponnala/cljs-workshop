@@ -1,9 +1,12 @@
 (ns cljsworkshop.core
-  (:require-macros [secretary.core :refer [defroute]])
+  (:require-macros [secretary.core :refer [defroute]]
+                   [cljs.core.async.macros :refer [go]])
   (:require [goog.events :as events]
             [goog.dom :as dom]
             [goog.style :as style]
-            [secretary.core :as secretary])
+            [secretary.core :as secretary]
+            [cljs.core.async :refer [<! put! chan]]
+            [reagent.core :as reagent :refer [atom]])
   (:import goog.History
            goog.Uri
            goog.net.Jsonp))
@@ -13,6 +16,84 @@
 
 (defn set-html! [el content]
   (set! (.-innerHTML el) content))
+
+(defn hello [name]
+  [:div "hello " name])
+
+(defn page [body]
+  [:div.page
+   [:div.header "This is header"]
+   body
+   [:div.footer "This is footer"]])
+
+(def expanded (reagent/atom false))
+(def click-count (reagent/atom 0))
+
+(defn counting-component []
+  [:div
+   "The atom " [:code "click-count"] " has value: "
+   @click-count ". "
+   [:input {:type "button" :value "Click me!"
+            :on-click #(swap! click-count inc)}]])
+
+(defn register []
+  [:div.container
+   [:h1.well "Registration Form"]
+   [:div {:class "col-lg-12 well"}
+    [:div.row
+     [:form
+      [:div.col-sm-12
+       [:div.row
+        [:div {:class "col-sm-6 form-group"}
+         [:label "First Name"]
+         [:input.form-control
+          {:type "text" :placeholder "Enter First Name Here..."}]]
+        [:div {:class "col-sm-6 form-group"}
+         [:label "Last Name"]
+         [:input.form-control
+          {:type "text" :placeholder "Enter Last Name Here..."}]]]
+       [:div.form-group
+        [:label "Address"]
+        [:textarea.form-control {:placeholder "Enter Address Here..."
+                                 :rows "3"}]]
+       [:div.row
+        [:div {:class "col-sm-4 form-group"}
+         [:label "City"]
+         [:input.form-control {:type "text"
+                               :placeholder "Enter City Name Here..."}]]
+        [:div {:class "col-sm-4 form-group"}
+         [:label "State"]
+         [:input.form-control {:type "text"
+                               :placeholder "Enter State Here..."}]]
+        [:div {:class "col-sm-4 form-group"}
+         [:label "Zip Code"]
+         [:input.form-control {:type "text"
+                               :placeholder "Enter Zip Code Here..."}]]]
+       [:div.row
+        [:div {:class "col-sm-6 form-group"}
+         [:label "Title"]
+         [:input.form-control {:type "text"
+                               :placeholder "Enter Designation Here.."}]]
+        [:div {:class "col-sm-6 form-group"}
+         [:label "Company"]
+         [:input.form-control {:type "text"
+                               :placeholder "Enter Company Name Here.."}]]]
+       [:div.form-group
+        [:label "Phone Number"]
+        [:input.form-control {:type "number"
+                              :placeholder "Enter Phone Number Here.."}]]
+       [:div.form-group
+        [:label "Email Address"]
+        [:input.form-control {:type "email"
+                              :placeholder "Enter Email Here.."}]]
+       [:div.form-group
+        [:label "Website"]
+        [:input.form-control {:type "url"
+                              :placeholder "Enter Website Name Here.."}]]
+       [:input {:class "btn btn-lg btn-info"
+                :type "button"
+                :value "Submit"}]]]]]])
+
 
 ;; for ajax
 (def search-url "http://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=")
@@ -51,9 +132,20 @@
                             (do-jsonp searchuri on-response)))]
     (events/listen (dom/getElement "searchbutton") "click" on-search-click)))
 
+(defroute register-path "/register" []
+  (reagent/render register (.-body js/document)))
+
 (defroute some-path "/:param" [param]
   (let [message (str "<h1>Parameter in url: <small>"param "</small>!</h1>")]
     (set-html! app message)))
+
+(defroute hello-path "/hello/:name" [name]
+  (reagent/render [page [hello name]] (.-body js/document)))
+
+(defroute atomex "/atomex/"
+  []
+  (reagent/render counting-component (.-body js/document)))
+
 
 (defroute "*" []
   (set-html! app "<h1>Not Found</h1>"))
